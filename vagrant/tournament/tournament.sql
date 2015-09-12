@@ -6,4 +6,16 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+\c tournament;
+
+CREATE TABLE Players (
+                      id SERIAL PRIMARY KEY,
+                      name TEXT
+);
+
+CREATE TABLE Matches (
+                      win SERIAL references Players(id),
+                      loss SERIAL references Players(id)
+);
+
 

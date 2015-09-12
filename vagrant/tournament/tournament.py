@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
@@ -11,27 +11,52 @@ def connect():
     return psycopg2.connect("dbname=tournament")
 
 
+def queryNoFetch(query):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    conn.commit()
+    conn.close()
+
+
+def queryFetchOne(query):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    results = cursor.fetchone()
+    conn.commit()
+    conn.close()
+
+    return results
+
+
 def deleteMatches():
     """Remove all the match records from the database."""
+    queryNoFetch("DELETE FROM Matches;")
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    queryNoFetch("DELETE FROM Players;")
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    count = queryFetchOne("SELECT count(*) FROM Players;")[0]
+
+    return count
 
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
-  
+
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
+    print queryNoFetch("INSERT INTO Players (name) VALUES ('%s');" % name)
 
 
 def playerStandings():
@@ -56,16 +81,16 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
- 
+
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
