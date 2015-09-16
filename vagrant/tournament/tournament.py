@@ -30,22 +30,22 @@ def getCursor():
         conn.close()
 
 
-def queryNoFetch(query):
+def queryNoFetch(query, *args):
     with getCursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, *args)
 
 
-def queryFetchOne(query):
+def queryFetchOne(query, *args):
     with getCursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, *args)
         results = cursor.fetchone()
 
     return results
 
 
-def queryFetchAll(query):
+def queryFetchAll(query, *args):
     with getCursor() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, *args)
         results = cursor.fetchall()
 
     return results
@@ -77,10 +77,8 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    # Check if name contains apostrophe
-    name = name.replace("'", "''")
 
-    queryNoFetch("INSERT INTO Players (name) VALUES ('%s');", (name, ))
+    queryNoFetch("INSERT INTO Players (name) VALUES (%s);", (name, ))
 
 
 def playerStandings():
@@ -107,7 +105,7 @@ def reportMatch(winner, loser):
       loser:  the id number of the player who lost
     """
     queryNoFetch("INSERT INTO Matches (winner, loser) VALUES (%s, %s)",
-                 (winner, loser if loser else 'null'))
+                 (winner, loser))
 
 
 def getPreviousByes():
