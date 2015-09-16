@@ -30,6 +30,17 @@ def queryFetchOne(query):
     return results
 
 
+def queryFetchAll(query):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.commit()
+    conn.close()
+
+    return results
+
+
 def deleteMatches():
     """Remove all the match records from the database."""
     queryNoFetch("DELETE FROM Matches;")
@@ -56,7 +67,10 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    print queryNoFetch("INSERT INTO Players (name) VALUES ('%s');" % name)
+    # Check if name contains apostrophe
+    name = name.replace("'", "''")
+
+    queryNoFetch("INSERT INTO Players (name) VALUES ('%s');" % name)
 
 
 def playerStandings():
@@ -72,6 +86,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    return queryFetchAll("SELECT * FROM Standing;")
 
 
 def reportMatch(winner, loser):
@@ -81,6 +96,15 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    queryNoFetch("INSERT INTO Matches (winner, loser) VALUES (%s, %s)" %
+                 (winner, loser if loser else 'null'))
+
+
+def getPreviousByes():
+    results = queryFetchAll("SELECT * FROM Bye")
+
+    # Process results into list of id, instead of list of tuples of id
+    return [id_tuple[0] for id_tuple in results]
 
 
 def swissPairings():
@@ -98,5 +122,23 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    standings = playerStandings()
+    nextRound = []
 
+    # If there is odd number of players, give 'bye' to a player highest in rank
+    # who has yet to receive one.
+    if len(standings) % 2 == 1:
+        previous_byes = getPreviousByes()
 
+        for player in standings:
+            if player[0] not in previous_byes:
+                nextRound.append((player[0], player[1], None, None))
+                standings.remove(player)
+                break
+
+    for rank in range(0, len(standings), 2):
+        pair = (standings[rank][0], standings[rank][1],
+                standings[rank + 1][0], standings[rank + 1][1])
+        nextRound.append(pair)
+
+    return nextRound

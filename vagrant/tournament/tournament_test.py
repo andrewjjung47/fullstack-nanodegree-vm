@@ -125,6 +125,42 @@ def testPairings():
     print "8. After one match, players with one win are paired."
 
 
+def testOddPairings():
+    deleteMatches()
+    deletePlayers()
+    registerPlayer("Emma Watson")
+    registerPlayer("Jennifer Lawrence")
+    registerPlayer("Natalie Dormer")
+    registerPlayer("Carey Mulligan")
+    registerPlayer("Natalie Portman")
+
+    standings = playerStandings()
+    [id1, id2, id3, id4, id5] = [row[0] for row in standings]
+    reportMatch(id1, None)
+    reportMatch(id2, id3)
+    reportMatch(id4, id5)
+    pairings = swissPairings()
+
+    if len(pairings) != 3:
+        raise ValueError(
+            "For five players, swissPairings should return three pairs.")
+    [(pid1, pname1, pid2, pname2),
+        (pid3, pname3, pid4, pname4),
+        (pid5, pname5, pid6, pname6)] = pairings
+    correct_pairs = set([frozenset([id2, None]),
+                        frozenset([id1, id4]),
+                        frozenset([id3, id5])])
+    actual_pairs = set([frozenset([pid1, pid2]),
+                       frozenset([pid3, pid4]),
+                       frozenset([pid5, pid6])])
+    if correct_pairs != actual_pairs:
+        print "Correct pairs: " + correct_pairs
+        print "Actual pairs: " + actual_pairs
+        raise ValueError(
+            "Odd number of players are not matched correctly.")
+    print "9. Bye is given to the player with highest standing and has yet to receive one"
+
+
 if __name__ == '__main__':
     testDeleteMatches()
     testDelete()
@@ -134,6 +170,7 @@ if __name__ == '__main__':
     testStandingsBeforeMatches()
     testReportMatches()
     testPairings()
+    testOddPairings()
     print "Success!  All tests pass!"
 
 
