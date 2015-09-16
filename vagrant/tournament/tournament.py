@@ -4,6 +4,7 @@
 #
 
 import psycopg2
+from contextlib import contextmanager
 
 
 def connect():
@@ -11,32 +12,41 @@ def connect():
     return psycopg2.connect("dbname=tournament")
 
 
-def queryNoFetch(query):
+@contextmanager
+def getCursor():
+    """
+    Yield a cursor, and in with block, query can be executed
+    """
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(query)
-    conn.commit()
-    conn.close()
+
+    try:
+        yield cursor
+    except:
+        raise
+    else:
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def queryNoFetch(query):
+    with getCursor() as cursor:
+        cursor.execute(query)
 
 
 def queryFetchOne(query):
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute(query)
-    results = cursor.fetchone()
-    conn.commit()
-    conn.close()
+    with getCursor() as cursor:
+        cursor.execute(query)
+        results = cursor.fetchone()
 
     return results
 
 
 def queryFetchAll(query):
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    conn.commit()
-    conn.close()
+    with getCursor() as cursor:
+        cursor.execute(query)
+        results = cursor.fetchall()
 
     return results
 
@@ -70,7 +80,7 @@ def registerPlayer(name):
     # Check if name contains apostrophe
     name = name.replace("'", "''")
 
-    queryNoFetch("INSERT INTO Players (name) VALUES ('%s');" % name)
+    queryNoFetch("INSERT INTO Players (name) VALUES ('%s');", (name, ))
 
 
 def playerStandings():
@@ -96,7 +106,7 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    queryNoFetch("INSERT INTO Matches (winner, loser) VALUES (%s, %s)" %
+    queryNoFetch("INSERT INTO Matches (winner, loser) VALUES (%s, %s)",
                  (winner, loser if loser else 'null'))
 
 
