@@ -228,6 +228,33 @@ def newCategory():
     else:
         return render_template('newCategory.html')
 
+# Edit category
+@app.route('/category/<int:category_id>/edit/', methods=['GET','POST'])
+@flask_login.login_required
+def editCategory(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            category.name = request.form['name']
+        session.add(category)
+        session.commit()
+        return redirect(url_for('showItems', category_id=category_id))
+    else:
+        return render_template('editCategory.html', category_id=category_id, category=category)
+
+# Delete a category
+@app.route('/category/<int:category_id>/delete/', methods=['GET','POST'])
+@flask_login.login_required
+def deleteCategory(category_id):
+    category = session.query(Category).filter_by(id = category_id).one()
+    if request.method == 'POST':
+        session.delete(category)
+        flash('%s Successfully Deleted' % category.name)
+        session.commit()
+        return redirect(url_for('showCategories'))
+    else:
+        return render_template('deleteCategory.html',category_id = category_id, category = category)
+
 #Edit a restaurant
 @app.route('/restaurant/<int:restaurant_id>/edit/', methods = ['GET', 'POST'])
 def editRestaurant(restaurant_id):
@@ -309,7 +336,7 @@ def editItem(category_id, item_id):
             item.description = request.form['description']
         if request.form['category_id']:
             item.category_id = request.form['category_id']
-        session.add(Item)
+        session.add(item)
         session.commit() 
         flash('Item Successfully Edited')
         return redirect(url_for('showOneItem', category_id=category_id, item_id=item_id))
