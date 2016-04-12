@@ -3,8 +3,12 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-xs-12">
+  <div class="col-xs-8">
     <h2>Item</h2> 
+  </div>
+  <div class="col-xs-4 text-right">
+    <a href="{{url_for('editItem', category_id=category_id, item_id=item_id)}}" class="btn">Edit</a>
+    <a href="{{url_for('showItems', category_id=category_id)}}" class="btn">Delete</a>
   </div>
 </div>
 <div class="row">

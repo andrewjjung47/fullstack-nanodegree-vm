@@ -277,12 +277,12 @@ def showOneItem(category_id, item_id):
     public = False
     if 'username' not in login_session:
         public = True
-    return render_template('oneItem.html', public=public, item=item, category_id=category_id)
+    return render_template('oneItem.html', public=public, item=item, category_id=category_id, item_id=item_id)
 
 
 
 #Create a new item
-@app.route('/category/item/new/<int:category_id>/',methods=['GET','POST'])
+@app.route('/category/<int:category_id>/item/new/',methods=['GET','POST'])
 @flask_login.login_required
 def newItem(category_id):
     if request.method == 'POST':
@@ -296,26 +296,25 @@ def newItem(category_id):
         return render_template('newItem.html', categories = categories, category_id=category_id)
 
 #Edit a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET','POST'])
-def editMenuItem(restaurant_id, menu_id):
+@app.route('/category/<int:category_id>/item/<int:item_id>/edit/', methods=['GET','POST'])
+@flask_login.login_required
+def editItem(category_id, item_id):
+    item = session.query(Item).filter_by(id = item_id).one()
+    categories = session.query(Category).order_by(asc(Category.name))
 
-    editedItem = session.query(MenuItem).filter_by(id = menu_id).one()
-    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     if request.method == 'POST':
         if request.form['name']:
-            editedItem.name = request.form['name']
+            item.name = request.form['name']
         if request.form['description']:
-            editedItem.description = request.form['description']
-        if request.form['price']:
-            editedItem.price = request.form['price']
-        if request.form['course']:
-            editedItem.course = request.form['course']
-        session.add(editedItem)
+            item.description = request.form['description']
+        if request.form['category_id']:
+            item.category_id = request.form['category_id']
+        session.add(Item)
         session.commit() 
-        flash('Menu Item Successfully Edited')
-        return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+        flash('Item Successfully Edited')
+        return redirect(url_for('showOneItem', category_id=category_id, item_id=item_id))
     else:
-        return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
+        return render_template('editItem.html', category_id=category_id, item_id=item_id, item=item, categories=categories)
 
 
 #Delete a menu item
