@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-xs-12">
+    <h2>Item</h2> 
+  </div>
+</div>
+<div class="row">
+    <div class="col-xs-6">
+      {{item.name}}
+    </div>
+    <div class="col-xs-6">
+      Category: {{item.category.name}}
+    </div>
+    <div class="col-xs-12">
+      <p>{{item.description}}</p>  
+    </div>
+    <div class="col-xs-12 text-right">
+      <a href="{{url_for('showItems', category_id=category_id)}}" class="btn">Back to list of items</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

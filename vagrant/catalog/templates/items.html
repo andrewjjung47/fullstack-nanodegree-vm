@@ -14,7 +14,7 @@
         <div class="content-box">
           <ul>
             {% for item in items %}
-            <li>{{item.name}}</li>
+            <li><a href="{{url_for('showOneItem', category_id=item.category_id, item_id=item.id)}}">{{item.name}}</a></li>
             {% endfor %}
           </ul>
         </div>

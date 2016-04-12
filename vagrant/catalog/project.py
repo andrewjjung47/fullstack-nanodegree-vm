@@ -257,7 +257,7 @@ def deleteRestaurant(restaurant_id):
 
 # Show items in a category
 @app.route('/category/<int:category_id>/')
-@app.route('/category/<int:category_id>/item')
+@app.route('/category/<int:category_id>/items')
 def showItems(category_id):
     items = session.query(Item).filter_by(category_id = category_id).all()
     category = session.query(Category).filter_by(id = category_id).one()
@@ -267,6 +267,17 @@ def showItems(category_id):
     if 'username' not in login_session:
         public = True
     return render_template('items.html', public=public, items=items, category_id=category_id, category=category)
+
+# Show an item in a category
+@app.route('/category/<int:category_id>/<int:item_id>')
+def showOneItem(category_id, item_id):
+    item = session.query(Item).filter_by(id = item_id).one()
+
+    # Only authenticated user can add an item
+    public = False
+    if 'username' not in login_session:
+        public = True
+    return render_template('oneItem.html', public=public, item=item, category_id=category_id)
 
 
 
