@@ -196,7 +196,7 @@ def itemsJSON(category_id):
 @app.route('/category/')
 def showCategories():
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('categories.html', public = public, categories=categories)
+    return render_template('categories.html', categories=categories)
 
 # Create a new category
 @app.route('/category/new/', methods=['GET','POST'])
@@ -244,14 +244,14 @@ def showItems(category_id):
     items = session.query(Item).filter_by(category_id = category_id).all()
     category = session.query(Category).filter_by(id = category_id).one()
 
-    return render_template('items.html', public=public, items=items, category_id=category_id, category=category)
+    return render_template('items.html', items=items, category_id=category_id, category=category)
 
 # Show an item in a category
 @app.route('/category/<int:category_id>/<int:item_id>')
 def showOneItem(category_id, item_id):
     item = session.query(Item).filter_by(id = item_id).one()
 
-    return render_template('oneItem.html', public=public, item=item, category_id=category_id, item_id=item_id)
+    return render_template('oneItem.html', item=item, category_id=category_id, item_id=item_id)
 
 #Create a new item
 @app.route('/category/<int:category_id>/item/new/',methods=['GET','POST'])
