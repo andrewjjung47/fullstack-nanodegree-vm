@@ -26,8 +26,8 @@ class Category(Base):
     def serialize(self):
        return {
            'name'         : self.name,
-           'description'         : self.description,
-           'id'         : self.id
+           'id'         : self.id,
+           'items': [i.serialize for i in self.items]
        }
 
 class Item(Base):
@@ -48,7 +48,7 @@ class Item(Base):
            'name'         : self.name,
            'description'         : self.description,
            'id'         : self.id,
-           'category'         : self.category
+           'category'         : self.category.name
        }
 
 

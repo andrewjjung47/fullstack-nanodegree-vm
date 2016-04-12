@@ -7,8 +7,10 @@
     <h2>Item</h2> 
   </div>
   <div class="col-xs-4 text-right">
+    {% if current_user.is_authenticated %}
     <a href="{{url_for('editItem', category_id=category_id, item_id=item_id)}}" class="btn">Edit</a>
-    <a href="{{url_for('showItems', category_id=category_id)}}" class="btn">Delete</a>
+    <a href="{{url_for('deleteItem', category_id=category_id, item_id=item_id)}}" class="btn">Delete</a>
+    {% endif %}
   </div>
 </div>
 <div class="row">

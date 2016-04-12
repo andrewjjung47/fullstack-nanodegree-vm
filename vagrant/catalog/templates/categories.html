@@ -5,9 +5,11 @@
     <div class="col-xs-4">
         <h2>Category</h2>
     </div>
+    {% if current_user.is_authenticated %}
     <div class="col-xs-8 text-right">
       <a href="{{url_for('newCategory')}}" class="btn">Add Category</a>
     </div>
+    {% endif %}
 </div>
 <div class="row">
     <div class="col-xs-12">
