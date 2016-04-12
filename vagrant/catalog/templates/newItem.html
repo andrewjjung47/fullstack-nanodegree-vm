@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-xs-12">
+    <h2>Add Item</h2> 
+  </div>
+</div>
+<div class="row">
+  <form action="{{request.path}}" method="POST">
+    <div class="col-xs-6">
+      <label for="name">Name: </label><input type="text" name="name" id="name">
+    </div>
+    <div class="col-xs-6">
+      <label for="category">Category: </label>
+      <select name="category_id" id="category_id" onchange="">
+        {% for category in categories%}
+        <option value="{{category.id}}" {% if category_id == category.id %}selected{% endif %}>{{category.name}}</option>
+        {% endfor %} 
+      </select>
+    </div>
+    <div class="col-xs-12">
+      <label for="descripition">Description: </label><br>
+      <textarea name="description" id="description"></textarea> 
+    </div>
+    <div class="col-xs-12 text-right">
+      <a href="{{url_for('showItems', category_id=category_id)}}" class="btn">Back to list of items</a>
+      <input type="submit" class="btn" value="Save">
+    </div>
+  </form>
+</div>
+{% endblock %}

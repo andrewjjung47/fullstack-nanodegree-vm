@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-xs-12">
+    <h2>Add Category</h2> 
+  </div>
+</div>
+<div class="row">
+  <form action="{{request.path}}" method="POST">
+    <div class="col-xs-8">
+      <label for="Name_of_Category">Name: </label><input type="text" name="name" id="Name_of_Category">
+       
+    </div>
+    <div class="col-xs-4 text-right">
+      <a href="{{url_for('showCategories')}}" class="btn">Back to category</a>
+      <input type="submit" class="btn" value="Save">
+    </div>
+  </form>
+</div>
+{% endblock %}

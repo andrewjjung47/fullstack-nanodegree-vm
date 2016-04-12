@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "showLogin"
 
 CLIENT_ID = json.loads(
         open('client_secrets.json', 'r').read())['web']['client_id']
@@ -211,20 +212,19 @@ def showCategories():
     public = False
     if 'username' not in login_session:
         public = True
-    return render_template('categories.html', public = public)
+    return render_template('categories.html', public = public, categories=categories)
 
 # Create a new category
 @app.route('/category/new/', methods=['GET','POST'])
-def newRestaurant():
+@flask_login.login_required
+def newCategory():
     # Only authenticated users can create a new category
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         newCategory = Category(name = request.form['name'])
         session.add(newCategory)
         flash('New Category %s Successfully Created' % newCategory.name)
         session.commit()
-        return redirect(url_for('showCategory'))
+        return redirect(url_for('showCategories'))
     else:
         return render_template('newCategory.html')
 
@@ -260,27 +260,29 @@ def deleteRestaurant(restaurant_id):
 @app.route('/category/<int:category_id>/item')
 def showItems(category_id):
     items = session.query(Item).filter_by(category_id = category_id).all()
+    category = session.query(Category).filter_by(id = category_id).one()
 
     # Only authenticated user can add an item
     public = False
     if 'username' not in login_session:
         public = True
-    return render_template('items.html', public=public)
+    return render_template('items.html', public=public, items=items, category_id=category_id, category=category)
 
 
 
 #Create a new item
-@app.route('/category/item/new/',methods=['GET','POST'])
-def newItem():
+@app.route('/category/item/new/<int:category_id>/',methods=['GET','POST'])
+@flask_login.login_required
+def newItem(category_id):
     if request.method == 'POST':
-        newItem = Item(name = request.form['name'], description = request.form['description'], category_id = request.form['category_id'], creator = login_session['gplus_id'])
+        newItem = Item(name = request.form['name'], description = request.form['description'], category_id = request.form['category_id'], user_id = login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash('New Menu %s Item Successfully Created' % (newItem.name))
         return redirect(url_for('showItem', item_id = newItem.id))
     else:
         categories = session.query(Category).all()
-        return render_template('newItem.html', categories = categories)
+        return render_template('newItem.html', categories = categories, category_id=category_id)
 
 #Edit a menu item
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET','POST'])

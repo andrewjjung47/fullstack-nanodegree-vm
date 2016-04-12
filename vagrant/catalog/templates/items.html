@@ -3,18 +3,18 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-4">
-        <h2>Category</h2>
+      <h2>Items in {{category.name}}</h2>
     </div>
     <div class="col-xs-8 text-right">
-      <a href="{{url_for('newCategory')}}" class="btn">Add Category</a>
+      <a href="{{url_for('newItem', category_id=category_id)}}" class="btn">Add Item</a>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12">
         <div class="content-box">
           <ul>
-            {% for category in categories %}
-            <li><a href="{{url_for('showItems', category_id=category.id)}}">{{category.name}}</a></li>
+            {% for item in items %}
+            <li>{{item.name}}</li>
             {% endfor %}
           </ul>
         </div>
