@@ -38,7 +38,8 @@ def load_user(user_id):
 
 @app.route('/login')
 def showLogin():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)\
+            for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
@@ -223,7 +224,8 @@ def editCategory(category_id):
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('editCategory.html', category_id=category_id, category=category)
+        return render_template('editCategory.html', category_id=category_id, 
+                category=category)
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete/', methods=['GET','POST'])
@@ -235,7 +237,8 @@ def deleteCategory(category_id):
         session.commit()
         return redirect(url_for('showCategories'))
     else:
-        return render_template('deleteCategory.html',category_id = category_id, category = category)
+        return render_template('deleteCategory.html',category_id = category_id,
+                category = category)
 
 # Show items in a category
 @app.route('/category/<int:category_id>/')
@@ -244,7 +247,8 @@ def showItems(category_id):
     items = session.query(Item).filter_by(category_id = category_id).all()
     category = session.query(Category).filter_by(id = category_id).one()
 
-    return render_template('items.html', items=items, category_id=category_id, category=category)
+    return render_template('items.html', items=items, category_id=category_id,
+            category=category)
 
 # Show an item in a category
 @app.route('/category/<int:category_id>/<int:item_id>')
@@ -258,7 +262,8 @@ def showOneItem(category_id, item_id):
 @flask_login.login_required
 def newItem(category_id):
     if request.method == 'POST':
-        newItem = Item(name = request.form['name'], description = request.form['description'], category_id = request.form['category_id'], user_id = login_session['user_id'])
+        newItem = Item(name = request.form['name'], description = request.form['description'], 
+                category_id = request.form['category_id'], user_id = login_session['user_id'])
         session.add(newItem)
         session.commit()
         return redirect(url_for('showOneItem', category_id=category_id, item_id = newItem.id))
@@ -284,7 +289,8 @@ def editItem(category_id, item_id):
         session.commit() 
         return redirect(url_for('showOneItem', category_id=category_id, item_id=item_id))
     else:
-        return render_template('editItem.html', category_id=category_id, item_id=item_id, item=item, categories=categories)
+        return render_template('editItem.html', category_id=category_id, item_id=item_id, 
+                item=item, categories=categories)
 
 # Delete an item
 @app.route('/category/<int:category_id>/item/<int:item_id>/delete/', methods=['GET','POST'])
@@ -298,22 +304,6 @@ def deleteItem(category_id, item_id):
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('deleteItem.html',category_id = category_id, item_id=item_id, item = item)
-
-
-
-#Delete a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete', methods = ['GET','POST'])
-def deleteMenuItem(restaurant_id,menu_id):
-    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-    itemToDelete = session.query(MenuItem).filter_by(id = menu_id).one() 
-    if request.method == 'POST':
-        session.delete(itemToDelete)
-        session.commit()
-        return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-    else:
-        return render_template('deleteMenuItem.html', item = itemToDelete)
-
-
 
 
 if __name__ == '__main__':
